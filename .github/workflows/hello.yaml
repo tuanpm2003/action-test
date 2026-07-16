@@ -1,0 +1,24 @@
+name: hello
+
+on: push
+
+jobs:
+  say-hi:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - run: |
+          echo "Runner này là máy gì?"
+          uname -a
+          whoami
+
+  needs-demo:
+    needs:
+      - say-hi
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - run: echo "Tôi chỉ chạy sau khi say-hi xong"
