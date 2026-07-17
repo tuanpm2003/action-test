@@ -11,6 +11,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - uses: actions/checkout@v4
+
       - name: Debug OIDC claims
         uses: actions/github-script@v7
         with:
@@ -21,9 +23,6 @@ jobs:
             );
 
             console.log(payload);
-
-    steps:
-      - uses: actions/checkout@v4
 
       - uses: aws-actions/configure-aws-credentials@v4
 
