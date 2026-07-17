@@ -101,9 +101,17 @@ resource "aws_iam_role" "gha_lab" {
             "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
           }
 
-          # Chỉ repo này được assume
+          # Chỉ repo này được assume.
+          # AWS bắt buộc trust policy cho GitHub OIDC provider phải có
+          # điều kiện scope trên "sub" (hoặc "job_workflow_ref"), nên không
+          # thể dùng riêng claim "repository". Liệt kê cả 2 format của "sub"
+          # (cũ, và mới có kèm owner_id/repo_id) để không bị vỡ khi GitHub
+          # đổi format immutable subject claim.
           StringLike = {
-            "token.actions.githubusercontent.com:sub" = "repo:${var.github_username}/${var.github_repo}:*"
+            "token.actions.githubusercontent.com:sub" = [
+              "repo:${var.github_username}/${var.github_repo}:*",
+              "repo:${var.github_username}@*/${var.github_repo}@*:*",
+            ]
           }
         }
       }
@@ -138,6 +146,9 @@ output "github_actions_role_arn" {
 }
 
 output "trust_policy_subject" {
-  description = "GitHub subject được phép assume role"
-  value       = "repo:${var.github_username}/${var.github_repo}:*"
+  description = "GitHub subject (sub) được phép assume role"
+  value = [
+    "repo:${var.github_username}/${var.github_repo}:*",
+    "repo:${var.github_username}@*/${var.github_repo}@*:*",
+  ]
 }
